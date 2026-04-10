@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const addToCart = createAsyncThunk('/cart/add',
   async(data)=>{
-    const response = await axios.post('https://shivani-kohli-ecomarketplace.vercel.app/cart/add', data);
+    const response = await axios.post('https://mern-eco-friendly-ecommerce.onrender.com/cart/add', data);
     console.log("response of add to cart", response)
     return response.data
   }
@@ -13,7 +13,7 @@ export const fetchCart = createAsyncThunk('/cart/fetch',
   
   async(userId)=>{
 
-    const response = await axios.get(`https://shivani-kohli-ecomarketplace.vercel.app/cart/fetch/${userId}`);
+    const response = await axios.get(`https://mern-eco-friendly-ecommerce.onrender.com/cart/fetch/${userId}`);
     console.log("response of fetch cart", response);
     
     return response.data;
@@ -22,21 +22,21 @@ export const fetchCart = createAsyncThunk('/cart/fetch',
 export const deleteCart = createAsyncThunk('/cart/delete',
   async(data)=>{
     console.log("data is deletecart", data)
-    const response = await axios.delete('https://shivani-kohli-ecomarketplace.vercel.app/cart/delete',{data: data});
+    const response = await axios.delete('https://mern-eco-friendly-ecommerce.onrender.com/cart/delete',{data: data});
     console.log("response of delete cart", response)
     return response.data
   }
 )
 export const updateCart = createAsyncThunk('/cart/update',
   async(data)=>{
-    const response = await axios.put('https://shivani-kohli-ecomarketplace.vercel.app/cart/update', data);
+    const response = await axios.put('https://mern-eco-friendly-ecommerce.onrender.com/cart/update', data);
     return response.data
   }
 )
 
 export const addOrders = createAsyncThunk('/cart/addOrder',
   async(userId)=>{
-    const response = await axios.post('https://shivani-kohli-ecomarketplace.vercel.app/cart/addOrder', {userId: userId});
+    const response = await axios.post('https://mern-eco-friendly-ecommerce.onrender.com/cart/addOrder', {userId: userId});
     console.log("response of add order", response)
     return response.data
   }
