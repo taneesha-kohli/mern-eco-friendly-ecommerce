@@ -15,10 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: [
-      'http://localhost:5173',
-       'https://mern-eco-friendly-ecommerce.vercel.app'
-  ],
+  origin: 'https://mern-eco-friendly-ecommerce.vercel.app',
   credentials: true
 }))
 
