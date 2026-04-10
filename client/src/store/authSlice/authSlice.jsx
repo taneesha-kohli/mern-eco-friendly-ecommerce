@@ -11,14 +11,14 @@ const initialState = {
 
 export const registerUser = createAsyncThunk('/auth/register',
   async(formData)=>{
-    const response = await axios.post('http://localhost:5000/auth/register', formData)
+    const response = await axios.post('http://mern-eco-friendly-ecommerce.onrender.com/auth/register', formData)
     return response.data;
   }
 )
 
 export const loginUser = createAsyncThunk('/auth/login',
   async(formData)=>{
-    const response = await axios.post('http://localhost:5000/auth/login', formData, {
+    const response = await axios.post('http://mern-eco-friendly-ecommerce.onrender.com/auth/login', formData, {
       withCredentials: true
     });
     return response.data;
@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk('/auth/login',
 
 export const checkAuth = createAsyncThunk('/auth/checkAuth',
   async()=>{
-    const response = await axios.get('http://localhost:5000/auth/checkAuth',{
+    const response = await axios.get('http://mern-eco-friendly-ecommerce.onrender.com/auth/checkAuth',{
         withCredentials: true
       })
       
@@ -39,7 +39,7 @@ export const checkAuth = createAsyncThunk('/auth/checkAuth',
 
 export const logoutUser = createAsyncThunk('/auth/logout',
   async()=>{
-    const response = await axios.post('http://localhost:5000/auth/logout', {},
+    const response = await axios.post('http://mern-eco-friendly-ecommerce.onrender.com/auth/logout', {},
       {
         withCredentials: true
       }

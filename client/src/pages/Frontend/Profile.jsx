@@ -61,7 +61,7 @@ const Profile = () => {
             <label className="text-sm font-medium">Phone Number</label>
             <input
               type="text"
-              defaultValue="+91 8218890148"
+              defaultValue="+91 8956778888"
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
