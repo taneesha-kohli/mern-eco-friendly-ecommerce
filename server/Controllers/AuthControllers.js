@@ -76,16 +76,20 @@ const loginUser = async (request, response) => {
       { expiresIn: "60m" },
     );
 
-    response.cookie("token", token, { httpOnly: true }).json({
-      status: true,
-      message: "Logged in successfully",
-      user: {
-        username: user.username,
-        email: email,
-        userId: user._id,
-        role: user.role
-      },
-    });
+response.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None"
+}).json({
+  status: true,
+  message: "Logged in successfully",
+  user: {
+    username: user.username,
+    email: email,
+    userId: user._id,
+    role: user.role
+  }
+});
   
   }
 };
