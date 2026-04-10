@@ -11,42 +11,42 @@ const initialState = {
 export const uploadImage = createAsyncThunk('/product/uploadImage',
   async(multipartImageData)=>{
     console.log("upload image function is called")
-    const response = await axios.post('http://mern-eco-friendly-ecommerce.onrender.com/product/uploadImage', multipartImageData);
+    const response = await axios.post('https://mern-eco-friendly-ecommerce.onrender.com/product/uploadImage', multipartImageData);
     return response.data
   }
 )
 
 export const addProduct = createAsyncThunk('/product/add',
   async(formData)=>{
-    const response = await axios.post('http://mern-eco-friendly-ecommerce.onrender.com/product/add', formData);
+    const response = await axios.post('https://mern-eco-friendly-ecommerce.onrender.com/product/add', formData);
     console.log("response of product add");
     return response.data;
   }
 )
 export const fetchProducts = createAsyncThunk('/product/fetch',
   async()=>{
-    const response = await axios.get('http://mern-eco-friendly-ecommerce.onrender.com/product/fetch');
+    const response = await axios.get('https://mern-eco-friendly-ecommerce.onrender.com/product/fetch');
     // console.log("response of product fetch", response);
     return response.data;
   }
 )
 export const deleteProduct = createAsyncThunk('/product/delete',
   async(id)=>{
-    const response = await axios.delete(`http://mern-eco-friendly-ecommerce.onrender.com/product/delete/${id}`);
+    const response = await axios.delete(`https://mern-eco-friendly-ecommerce.onrender.com/product/delete/${id}`);
     console.log("response of product add");
     return response.data;
   }
 )
 export const updateProduct = createAsyncThunk('/product/update',
   async(formData)=>{
-    const response = await axios.put(`http://mern-eco-friendly-ecommerce.onrender.com/product/update/${formData._id}`, formData);
+    const response = await axios.put(`https://mern-eco-friendly-ecommerce.onrender.com/product/update/${formData._id}`, formData);
     console.log("response of product add");
     return response.data;
   }
 )
 export const getProduct = createAsyncThunk('/product/fetchOne',
   async(id)=>{
-    const response = await axios.get(`http://mern-eco-friendly-ecommerce.onrender.com/product/fetchOne/${id}`);
+    const response = await axios.get(`https://mern-eco-friendly-ecommerce.onrender.com/product/fetchOne/${id}`);
     console.log("response of product add");
     return response.data;
   }
