@@ -105,3 +105,9 @@ html, body
 {
   right:20px;
 }
+
+.border.rounded-xl.overflow-hidden.shadow-sm.relative {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

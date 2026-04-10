@@ -1,4 +1,5 @@
-import { Leaf, Truck, ShieldCheck, RefreshCcw } from "lucide-react"
+import products from './products.json'
+import { Leaf, Truck, ShieldCheck, RefreshCcw, ChevronLeft, ChevronRight, Heart } from "lucide-react"
 import {
   Carousel,
   CarouselContent,
@@ -6,21 +7,159 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, fetchCart, getCartTotal } from '@/store/shop/CartSlice';
+import { toast } from 'react-toastify';
+import { addToWishlist, getProduct } from '@/store/shop/ProductSlice';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function Home() {
+
+  const dispatch = useDispatch()
+
+  const array = [
+     "banner1.webp",
+     "banner2.avif",
+     "banner3.webp",
+     "banner4.webp "
+  ]
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const {products, wishlist} = useSelector((state)=> state.product)
+  const {user} = useSelector((state)=> state.auth)
+
+  const arrayLength = (array.length)-1;
+
+  console.log("Products through json", products);
+
+    const handleAddToCart = (productId)=>{
+      const cartData = {
+        userId: user.userId,
+        productId: productId,
+      }
+
+      dispatch(addToCart(cartData)).then((res)=>{
+        if(res.payload.status)
+        {
+          toast.success("Product added to cart");
+          dispatch(fetchCart(user.userId))
+          dispatch(getCartTotal())
+        }
+        if(res.payload.limit){
+          toast.error("You can't increase quantity more than 5")
+        }
+      })
+    }
+
+   const handleAddToWishlist = (productId)=>{
+      dispatch(addToWishlist(productId))
+   }
+
+   const navigate = useNavigate();
+
+    const handleActiveCategory = (item)=>{
+  navigate(item.path ? item.path : `/shop?category=${encodeURIComponent(item.category)}`)
+
+  }
+    const handleActiveBrand = (item)=>{
+  navigate(item.path ? item.path : `/shop?brand=${encodeURIComponent(item.brand)}`)
+
+  }
+
+  const openProductDetail = (_id)=>{
+    dispatch(getProduct(_id));
+    navigate(`/shop/${_id}`);
+  }
+
+  const brands = [
+
+  {
+    brand: 'BareForm',
+    value: 'bareForm',
+    img: 'bareform.png'
+  },
+  {
+    brand: 'CarryKind',
+    value: 'carryKind',
+    img: 'carryKind.png'
+  },
+  {
+    brand: 'EarthWear',
+    value: 'earthWear',
+    img: 'earthWear.png'
+  },
+  {
+    brand: 'LoopLife',
+    value: 'loopLife',
+    img: 'loopLife.png'
+  },
+  {
+    brand: 'NestTheory',
+    value: 'nestTheory',
+    img: 'nestTheory.png'
+  },
+  {
+    brand: 'Root & Ritual',
+    value: 'root-ritual',
+    img: 'root.png'
+  },
+  {
+    brand: 'WildForm',
+    value: 'wildForm',
+    img: 'wildForm.png'
+  },
+  {
+    brand: 'TerraStep',
+    value: 'terraStep',
+    img: 'terrastep.png'
+  },
+  {
+    brand: 'BambooRoot',
+    value: 'bambooRoot',
+    img: 'bambooRoot.png'
+  }
+];
+
   return (
     <div className="w-full">
 
       {/* HERO BANNER */}
       <section className="bg-[#e6f5ef]">
-        <div className="max-w-full w-full">
+        <div className="max-w-full w-full slider relative">
 
-          <Carousel className="main-banner">
-            <CarouselContent>
-              <CarouselItem><img src="banner1.webp" className="w-full" /></CarouselItem>
-              <CarouselItem><img src="banner2.avif" className="w-full" /></CarouselItem>
-              <CarouselItem><img src="banner3.webp" className="w-full" /></CarouselItem>
-              <CarouselItem><img src="banner4.webp" className="w-full" /></CarouselItem>
+{/* 
+        <img src={array[activeIndex]} alt="" className="w-full max-w-full h-[140vh]" />
+
+       <div className="arrows flex absolute top-[40%] justify-between mx-3 w-[98.5%] ">
+        <div className="prev p-2 border-black border-2 rounded cursor-pointer" onClick={()=> setActiveIndex((prev)=> prev>0 ? --prev : arrayLength)}>
+            <ChevronLeft />
+        </div>
+        <div className="next p-2 border-black border-2 rounded cursor-pointer" onClick={()=> setActiveIndex((prev)=> prev<arrayLength ? ++prev : 0)}>
+          <ChevronRight />
+        </div>
+        </div>
+
+        <div className="bullets absolute gap-2 w-full flex justify-center bottom-4">
+        {
+          array.map((item,index)=>{
+            console.log("index", index, "is equal to active", index == activeIndex)
+            return(
+              <div className={`bullet w-4 h-4 rounded-[100%] border-black border-2 cursor-pointer ${activeIndex == index ? 'bg-[var(--main)] border-white' : ''}`} onClick={()=> setActiveIndex(index)}></div>
+            )
+          })
+        }
+         
+        </div> */}
+
+          <Carousel className="main-banner ">
+            <CarouselContent >
+              <CarouselItem><img src="banner1.webp" className="w-full h-[140vh]" /></CarouselItem>
+              <CarouselItem><img src="banner2.avif" className="w-full h-[140vh]" /></CarouselItem>
+              <CarouselItem><img src="banner3.webp" className="w-full h-[140vh]" /></CarouselItem>
+              <CarouselItem><img src="banner4.webp" className="w-full h-[140vh]" /></CarouselItem>
             </CarouselContent>
 
             <CarouselPrevious className="banner-prev"/>
@@ -44,43 +183,44 @@ export default function Home() {
 
             {[
               {
-                name: "Clothing",
+                category: "Clothing",
                 img: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b"
               },
               {
-                name: "Footwear",
+                category: "Footwear",
                 img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff"
               },
               {
-                name: "Bags",
+                category: "Bags",
                 img: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7"
               },
               {
-                name: "Accessories",
+                category: "Accessories",
                 img: "https://images.unsplash.com/photo-1519741497674-611481863552"
               },
               {
-                name: "Home & Living",
+                category: "Home & Living",
                 img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
               },
               {
-                name: "Reusable Products",
+                category: "Reusable Products",
                 img: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807"
               }
             ].map((cat) => (
               <div
                 key={cat.name}
                 className="border rounded-lg overflow-hidden hover:shadow-md cursor-pointer bg-white"
+              onClick={()=> handleActiveCategory(cat)}  
               >
 
                 <img
                   src={cat.img}
-                  alt={cat.name}
+                  alt={cat.category}
                   className="w-full h-36 object-cover"
                 />
 
                 <div className="p-3 text-center">
-                  <p className="font-medium">{cat.name}</p>
+                  <p className="font-medium">{cat.category}</p>
                 </div>
 
               </div>
@@ -102,56 +242,24 @@ export default function Home() {
   Trusted Eco Brands
 </h2>
 
-<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-
-    <div
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-5">
+  {
+    brands.map((item)=>{
+    return(
+      <div
       className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
+      onClick={()=> handleActiveBrand(item)}
     >
       <img
-        src="baggu.png"
+        src={item.img}
         className="h-10 object-contain"
       />
     </div>
-    <div
-      className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
-    >
-      <img
-        src="lush.png"
-        className="h-10 object-contain"
-      />
-    </div>
-    <div
-      className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
-    >
-      <img
-        src="patagonia.png"
-        className="h-10 object-contain"
-      />
-    </div>
-    <div
-      className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
-    >
-      <img
-        src="reformation.png"
-        className="h-10 object-contain"
-      />
-    </div>
-    <div
-      className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
-    >
-      <img
-        src="veja.jpg"
-        className="h-10 object-contain"
-      />
-    </div>
-    <div
-      className="bg-white border rounded-lg flex items-center justify-center p-6 hover:shadow-md transition"
-    >
-      <img
-        src="tentree.webp"
-        className="h-10 object-contain"
-      />
-    </div>
+    )
+    })
+  }
+   
+  
 
 </div>
 
@@ -169,30 +277,36 @@ export default function Home() {
             Featured Products
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-            {[1,2,3,4].map((p) => (
-              <div
-                key={p}
-                className="border rounded-lg overflow-hidden hover:shadow-md"
-              >
-
-                <img
-                  src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db"
-                  className="h-48 w-full object-cover"
-                />
-
-                <div className="p-4">
-                  <h3 className="text-sm font-medium mb-2">
-                    Eco Friendly Product
-                  </h3>
-                  <p className="text-[#00965f] font-semibold">$29.00</p>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
+         
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {
+                 products.map((item)=>{
+                   const {_id, title, brand, price, image, status, stock} = item;
+                     const wishlistProduct = wishlist.find((item)=> item.productId == _id);
+                   if(status == 'Active')
+                   {
+                   return(
+                      <div className="border rounded-xl overflow-hidden shadow-sm relative " >
+                 <img
+                   src={image}
+                   className="w-full h-48 object-cover"
+                 />
+                 <div className="p-4">
+                    <h3 className="font-semibold cursor-pointer"  onClick={() => openProductDetail(_id)}>{title}</h3>
+                   <p className="text-sm text-gray-500">{brand}</p>
+                   <p className="text-green-600 font-bold">${price.toFixed(2)}</p>
+                 </div>
+                <Button className="bg-[var(--main)] p-5 text-white flex  mx-auto mb-5 w-[90%]" onClick={()=> handleAddToCart(_id)}>Add To Cart</Button>
+                                <Button className=" text-white flex rounded-[100%] absolute top-1 right-1 w-[35px] h-[35px]" onClick={()=> handleAddToWishlist(_id)}> <Heart className={wishlistProduct ? 'fill-red-600 stroke-transparent size-[25px] shadow-black' : 'size-[25px] shadow-black stroke-[var(--main)]'}/></Button>
+               </div>
+                   )
+                   }
+                 })
+                }
+          
+     
+     
+             </div>
 
         </div>
       </section>
@@ -225,30 +339,36 @@ export default function Home() {
             Best Sellers
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-            {[1,2,3,4].map((p) => (
-              <div
-                key={p}
-                className="border rounded-lg overflow-hidden hover:shadow-md"
-              >
-
-                <img
-                  src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db"
-                  className="h-48 w-full object-cover"
-                />
-
-                <div className="p-4">
-                  <h3 className="text-sm font-medium mb-2">
-                    Popular Eco Product
-                  </h3>
-                  <p className="text-[#00965f] font-semibold">$35.00</p>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
+          
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {
+                 products.map((item)=>{
+                   const {_id, title, brand, price, image, status, stock} = item;
+                     const wishlistProduct = wishlist.find((item)=> item.productId == _id);
+                   if(status == 'Active')
+                   {
+                   return(
+                      <div className="border rounded-xl overflow-hidden shadow-sm relative " >
+                 <img
+                   src={image}
+                   className="w-full h-48 object-cover"
+                 />
+                 <div className="p-4">
+                    <h3 className="font-semibold cursor-pointer"  onClick={() => openProductDetail(_id)}>{title}</h3>
+                   <p className="text-sm text-gray-500">{brand}</p>
+                   <p className="text-green-600 font-bold">${price.toFixed(2)}</p>
+                 </div>
+                <Button className="bg-[var(--main)] p-5 text-white flex  mx-auto mb-5 w-[90%]" onClick={()=> handleAddToCart(_id)}>Add To Cart</Button>
+                                <Button className=" text-white flex rounded-[100%] absolute top-1 right-1 w-[35px] h-[35px]" onClick={()=> handleAddToWishlist(_id)}> <Heart className={wishlistProduct ? 'fill-red-600 stroke-transparent size-[25px] shadow-black' : 'size-[25px] shadow-black stroke-[var(--main)]'}/></Button>
+               </div>
+                   )
+                   }
+                 })
+                }
+          
+     
+     
+             </div>
 
         </div>
       </section>
@@ -302,30 +422,36 @@ export default function Home() {
             New Arrivals
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-            {[1,2,3,4].map((p) => (
-              <div
-                key={p}
-                className="border rounded-lg overflow-hidden hover:shadow-md"
-              >
-
-                <img
-                  src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db"
-                  className="h-48 w-full object-cover"
-                />
-
-                <div className="p-4">
-                  <h3 className="text-sm font-medium mb-2">
-                    New Eco Product
-                  </h3>
-                  <p className="text-[#00965f] font-semibold">$32.00</p>
-                </div>
-
-              </div>
-            ))}
-
-          </div>
+         
+                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                         {
+                          products.map((item)=>{
+                            const {_id, title, brand, price, image, status, stock} = item;
+                              const wishlistProduct = wishlist.find((item)=> item.productId == _id);
+                            if(status == 'Active')
+                            {
+                            return(
+                               <div className="border rounded-xl overflow-hidden shadow-sm relative " >
+                          <img
+                            src={image}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="p-4">
+                             <h3 className="font-semibold cursor-pointer"  onClick={() => openProductDetail(_id)}>{title}</h3>
+                            <p className="text-sm text-gray-500">{brand}</p>
+                            <p className="text-green-600 font-bold">${price.toFixed(2)}</p>
+                          </div>
+                         <Button className="bg-[var(--main)] p-5 text-white flex  mx-auto mb-5 w-[90%]" onClick={()=> handleAddToCart(_id)}>Add To Cart</Button>
+                                         <Button className=" text-white flex rounded-[100%] absolute top-1 right-1 w-[35px] h-[35px]" onClick={()=> handleAddToWishlist(_id)}> <Heart className={wishlistProduct ? 'fill-red-600 stroke-transparent size-[25px] shadow-black' : 'size-[25px] shadow-black stroke-[var(--main)]'}/></Button>
+                        </div>
+                            )
+                            }
+                          })
+                         }
+                   
+              
+              
+                      </div>
 
         </div>
       </section>

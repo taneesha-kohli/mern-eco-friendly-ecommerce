@@ -1,0 +1,30 @@
+[
+  {
+    "id": "p9x3k7a1",
+    "name": "Organic Cotton T-Shirt",
+    "brand": "Pangaia",
+    "price": 1499,
+    "image": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "q2m8v4z6",
+    "name": "Eco Sneakers",
+    "brand": "Veja",
+    "price": 6999,
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "r7t1b5y9",
+    "name": "Reusable Tote Bag",
+    "brand": "Baggu",
+    "price": 999,
+    "image": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=400&q=80"
+  },
+  {
+    "id": "s4n6c2w8",
+    "name": "Natural Face Wash",
+    "brand": "Lush",
+    "price": 799,
+    "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80"
+  }
+]

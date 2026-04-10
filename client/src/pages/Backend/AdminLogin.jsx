@@ -1,8 +1,44 @@
 import { AdminLoginFormControls } from '@/FormControls'
-import FormLayout from '@/FormLayout'
-import React from 'react'
+import FormLayout from '@/Layouts/FormLayout'
+import { loginUser } from '@/store/authSlice/authSlice'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const AdminLogin = () => {
+
+     const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        role: 'admin'
+      })  
+
+      const dispatch = useDispatch();
+
+    const navigate = useNavigate();
+
+    const handleOnSubmit = (event)=>{
+      console.log("form data", formData)
+      event.preventDefault();
+      dispatch(loginUser(formData)).then((res)=>{
+        console.log("response of login", res)
+        if(!res.payload.status && !res.payload.wrongPass)
+        {
+          toast.error("admin doesn't exists with this email")
+        }
+        if(!res.payload.status && res.payload.wrongPass)
+        {
+          toast.error("Incorrect email or password")
+        }
+        if(res.payload.status)
+        {
+          toast.success("Admin logged in successfully");
+          navigate('/admin/dashboard')
+        }
+      })  
+    }
+
   return (
 
     
@@ -12,6 +48,9 @@ const AdminLogin = () => {
           <FormLayout 
         formControls={AdminLoginFormControls}
         buttonText={'Log In'}
+          formData={formData}
+        setFormData={setFormData}
+        handleOnSubmit={handleOnSubmit}
       />
       
       </div>

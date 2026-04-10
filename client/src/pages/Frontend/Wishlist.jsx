@@ -1,98 +1,83 @@
+import { addToCart, fetchCart, getCartTotal } from "@/store/shop/CartSlice";
+import { addToWishlist } from "@/store/shop/ProductSlice";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 export default function WishlistPage() {
+
+   const {products, wishlist} = useSelector((state)=> state.product);
+   const {user} = useSelector((state)=> state.auth);
+
+   console.log("products in wishlist", products, "wishlist item ",wishlist);
+
+   const dispatch = useDispatch();
+
+
+     const handleAddToCart = (productId)=>{
+         const cartData = {
+           userId: user.userId,
+           productId: productId,
+         }
+   
+         dispatch(addToCart(cartData)).then((res)=>{
+           if(res.payload.status)
+           {
+             toast.success("Product added to cart");
+             dispatch(fetchCart(user.userId))
+             dispatch(getCartTotal())
+           }
+           if(res.payload.limit){
+             toast.error("You can't increase quantity more than 5")
+           }
+         })
+       }
+
+          const handleAddToWishlist = (productId)=>{
+             dispatch(addToWishlist(productId))
+          }
+   
+
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-white p-6 w-full">
       <h1 className="text-3xl font-bold mb-6">My Wishlist</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {/* Item 1 */}
-        <div className="border rounded-xl overflow-hidden shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
+         {
+          wishlist.length > 0 && products ? 
+          wishlist.map((wishlistId)=>{
+           const product = products.find((item)=> item._id == wishlistId.productId);
+
+           console.log("matched product", product)
+                
+            return(
+                   <div className="border rounded-xl overflow-hidden shadow-sm w-full">
           <img
-            src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&q=80"
+            src={product?.image}
             className="w-full h-48 object-cover"
           />
           <div className="p-4">
-            <h3 className="font-semibold">Organic Cotton T-Shirt</h3>
-            <p className="text-sm text-gray-500">Pangaia</p>
-            <p className="text-green-600 font-bold">₹1,499</p>
+            <h3 className="font-semibold">{product?.title}</h3>
+            <p className="text-sm text-gray-500">{product?.brand}</p>
+            <p className="text-green-600 font-bold">${product?.price}</p>
 
             <div className="flex gap-2 mt-3">
-              <button className="flex-1 bg-green-600 text-white py-2 rounded-md">
+              <button className="flex-1 bg-green-600 text-white py-2 rounded-md" onClick={()=> handleAddToCart(product._id)}>
                 Add to Cart
               </button>
-              <button className="flex-1 border py-2 rounded-md bg-red-600 text-white">
+              <button className="flex-1 border py-2 rounded-md bg-red-600 text-white" onClick={()=> handleAddToWishlist(product._id)}>
                 Remove
               </button>
             </div>
           </div>
         </div>
+            )
+          }) :
+          <h1 className="text-2xl font-bold">No wishlist products</h1>
+         }
 
-        {/* Item 2 */}
-        <div className="border rounded-xl overflow-hidden shadow-sm">
-          <img
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h3 className="font-semibold">Eco Sneakers</h3>
-            <p className="text-sm text-gray-500">Veja</p>
-            <p className="text-green-600 font-bold">₹6,999</p>
+    
 
-            <div className="flex gap-2 mt-3">
-              <button className="flex-1 bg-green-600 text-white py-2 rounded-md">
-                Add to Cart
-              </button>
-              <button className="flex-1 border py-2 rounded-md bg-red-600 text-white">
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Item 3 */}
-        <div className="border rounded-xl overflow-hidden shadow-sm">
-          <img
-            src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=400&q=80"
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h3 className="font-semibold">Reusable Tote Bag</h3>
-            <p className="text-sm text-gray-500">Baggu</p>
-            <p className="text-green-600 font-bold">₹999</p>
-
-            <div className="flex gap-2 mt-3">
-              <button className="flex-1 bg-green-600 text-white py-2 rounded-md">
-                Add to Cart
-              </button>
-              <button className="flex-1 border py-2 rounded-md bg-red-600 text-white">
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Item 4 */}
-        <div className="border rounded-xl overflow-hidden shadow-sm">
-          <img
-            src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80"
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h3 className="font-semibold">Natural Face Wash</h3>
-            <p className="text-sm text-gray-500">Lush</p>
-            <p className="text-green-600 font-bold">₹799</p>
-
-            <div className="flex gap-2 mt-3">
-              <button className="flex-1 bg-green-600 text-white py-2 rounded-md">
-                Add to Cart
-              </button>
-              <button className="flex-1 border py-2 rounded-md bg-red-600 text-white">
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { createBrowserRouter, RouterProvider, useLocation } from 'react-router-dom'
 import AppLayout from './AppLayout'
 import Home from './pages/Frontend/Index'
 import ShopPage from './pages/Frontend/ShopPage'
@@ -30,13 +30,44 @@ import AddBannerPage from './pages/Backend/AddBanner'
 import EditBannerPage from './pages/Backend/EditBanner'
 import FeaturedProductsPage from './pages/Backend/Featured'
 import AddFeaturedProduct from './pages/Backend/AddFeatured'
+import ProtectedRoutes from './ProtectedRoutes'
+import { useDispatch, useSelector } from 'react-redux'
+import { checkAuth } from './store/authSlice/authSlice'
+import { fetchProducts } from './store/shop/ProductSlice'
+import { fetchCart, getCartTotal } from './store/shop/CartSlice'
+import ProductDetail from './pages/Frontend/ProductDetail'
 
 const FrontendRoutes = () => {
 
+  
+  const {cartData} = useSelector((state)=> state.cart);
+  const {user, isAuthenticated, isLoading} = useSelector((state)=> state.auth);
+  
+  console.log("cart data in frontend routes", cartData)
+
+  const dispatch = useDispatch();
+
+
+  useEffect(()=>{
+    dispatch(checkAuth());
+    dispatch(fetchProducts());
+    if(user)
+    {    
+      console.log("dispatching fetchCart with user", user)
+      dispatch(fetchCart(user.userId));
+      dispatch(getCartTotal());
+    }
+  },[])
+
+
+
+
   const routes = createBrowserRouter([
-    {
+    { 
       path: '/',
-      element: <AppLayout/>,
+      element:
+      <AppLayout/>
+      ,
       children:[
         {
           path: '/',
@@ -47,24 +78,33 @@ const FrontendRoutes = () => {
           element: <ShopPage/>
         },
         {
-          path: '/wishlist',
-          element: <WishlistPage/>
+          path: '/shop/:id',
+          element: <ProductDetail/>
         },
         {
           path: '/cart',
-          element: <CartPage/>
+          element:
+          <ProtectedRoutes>
+          <CartPage/>
+          </ProtectedRoutes>
         },
         {
           path: '/cart/checkout',
-          element: <CheckoutPage/>
+          element: 
+          // <ProtectedRoutes user={user} isAuthenticated={isAuthenticated} isLoading={isLoading}>
+          <ProtectedRoutes>
+          <CheckoutPage/>
+          </ProtectedRoutes>
         },
         {
           path: '/login',
-          element: <Login/>
+          element: 
+          <Login/>
         },
         {
           path: '/register',
-          element: <Register/>
+          element: 
+          <Register/>
         },
         {
           path: '/contact',
@@ -72,7 +112,11 @@ const FrontendRoutes = () => {
         },
         {
           path: '/profile',
-          element: <ProfileLayout/>,
+          element:
+              //  <ProtectedRoutes user={user} isAuthenticated={isAuthenticated} isLoading={isLoading}>
+                   <ProtectedRoutes>
+                   <ProfileLayout/>
+                   </ProtectedRoutes> ,
           children: [
             {
               path: '/profile',
@@ -108,7 +152,11 @@ const FrontendRoutes = () => {
     },
     {
       path: '/admin',
-      element: <DashboardLayout/>,
+      element: 
+        <ProtectedRoutes>
+      <DashboardLayout/>
+      </ProtectedRoutes>
+      ,
       children:[
         {
           path: 'dashboard',
@@ -160,7 +208,8 @@ const FrontendRoutes = () => {
     },
     {
       path: '/admin/login',
-      element: <AdminLogin/>
+      element:
+      <AdminLogin/>
     }
   ])
 

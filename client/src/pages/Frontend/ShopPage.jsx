@@ -1,6 +1,234 @@
-import React from "react";
+// import products from './products.json'
+import { Button } from "@/components/ui/button";
+import { addToCart, fetchCart, getCartTotal } from "@/store/shop/CartSlice";
+import {
+  addToWishlist,
+  fetchProducts,
+  getProduct,
+} from "@/store/shop/ProductSlice";
+import { Heart } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ShopPage() {
+  const dispatch = useDispatch();
+  const { products, wishlist } = useSelector((state) => state.product);
+  const { user } = useSelector((state) => state.auth);
+  const [searchParams] = useSearchParams();
+  const activeCategory = searchParams.get("category");
+  const activeBrand = searchParams.get("brand");
+  const navigate = useNavigate();
+  const [category, setCategories] = useState([]);
+  const [brand, setBrand] = useState([]);
+  const [sortBy, setSortBy] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, []);
+
+  console.log("user", user);
+
+  console.log("products", products);
+
+  console.log("active brand", activeBrand);
+
+  const handleAddToCart = (productId) => {
+    const cartData = {
+      userId: user.userId,
+      productId: productId,
+    };
+
+    dispatch(addToCart(cartData)).then((res) => {
+      if (res.payload.status) {
+        toast.success("Product added to cart");
+        dispatch(fetchCart(user.userId));
+        dispatch(getCartTotal());
+      }
+      if (res.payload.limit) {
+        toast.error("You can't increase quantity more than 5");
+      }
+    });
+  };
+
+  const handleAddToWishlist = (productId) => {
+    dispatch(addToWishlist(productId));
+  };
+
+  const categories = [
+    "Clothing",
+    "Footwear",
+    "Bags",
+    "Accessories",
+    "Beauty & Personal Care",
+    "Home & Living",
+    "Reusable Products",
+    "Kitchen & Dining",
+    "Fitness & Outdoor",
+  ];
+
+  const brands = [
+    "TerraStep",
+    "CarryKind",
+    "BareForm",
+    "Root & Ritual",
+    "NestTheory",
+    "LoopLife",
+    "BambooRoot",
+    "WildForm",
+    "EarthWear",
+  ];
+
+  const handleClickedCategory = (item) => {
+    const exists = category.find((cat) => cat == item.toLowerCase());
+    if (exists) {
+      const updatedCategory = category.filter(
+        (cat) => cat != item.toLowerCase(),
+      );
+      setCategories(updatedCategory);
+    } else {
+      setCategories((prev) => [...prev, item.toLowerCase()]);
+    }
+  };
+  const handleClickedBrand = (item) => {
+    const exists = brand.find((br) => br == item.toLowerCase());
+    if (exists) {
+      const updatedBrand = brand.filter((br) => br != item.toLowerCase());
+      setBrand(updatedBrand);
+    } else {
+      setBrand((prev) => [...prev, item.toLowerCase()]);
+    }
+  };
+
+  const openProductDetail = (_id) => {
+    dispatch(getProduct(_id));
+    navigate(`/shop/${_id}`);
+  };
+
+  let filteredProducts = [];
+
+  if (category.length > 0 || brand.length > 0) {
+    category?.forEach((cat) => {
+
+        
+      let product = products.find((item) => item.category.toLowerCase() == cat);
+      if(product)
+      {
+      if(brand.length > 0)
+      {
+        // filteredProducts = [];
+      let brandProduct = brand.find((item) => item == product.brand.toLowerCase());
+      const exists = filteredProducts.find((item)=> item == product);
+  
+      if (brandProduct) {
+        if(!exists)
+        {
+
+          filteredProducts.push(product);
+        }
+      }
+
+    }
+    else 
+    {
+      const exists = filteredProducts.find((item)=> item == product);
+
+      if(!exists)
+      {
+        filteredProducts.push(product);
+      }
+    }
+  }
+
+      
+    });
+
+    brand?.forEach((br) => {
+
+      
+      let product = products.find((item) => item.brand.toLowerCase() == br);
+     if(product)
+     {
+      
+      if(category.length > 0)
+      {
+        // filteredProducts = [];
+      let catProduct = category.find((item) => item == product.category.toLowerCase());
+      const exists = filteredProducts.find((item)=> item == product);
+  
+      if (catProduct) {
+        if(!exists)
+        {
+
+          filteredProducts.push(product);
+        }
+      }
+
+
+    }
+    else 
+    {
+      const exists = filteredProducts.find((item)=> item == product);
+
+      if(!exists)
+      {
+        filteredProducts.push(product);
+      }
+    }
+    
+     }
+
+    });
+  }
+ 
+   else {
+    filteredProducts = products;
+  }
+
+  console.log("filter product before sort by", filteredProducts)
+
+   if(sortBy && filteredProducts)
+  {
+
+    if(sortBy == 'Price: Low to High')
+    {
+      const updated = [...filteredProducts].sort((a, b)=> a.price - b.price)
+      filteredProducts = updated
+    }
+    if(sortBy == 'Price: High to Low')
+    {
+      const updated = [...filteredProducts].sort((a, b)=> b.price - a.price)
+      filteredProducts = updated
+    }
+    if(sortBy == 'Title: A - Z')
+    {
+      const updated = [...filteredProducts].sort((a, b)=> a.title.localeCompare(b.title))
+      filteredProducts = updated
+    }
+    if(sortBy == 'Title: Z - A')
+    {
+      const updated = [...filteredProducts].sort((a, b)=> b.title.localeCompare(a.title))
+      filteredProducts = updated
+    }
+  }
+
+  console.log("filtered products", filteredProducts);
+
+  console.log("categories", category, " brand ", brand, " sort by ", sortBy);
+
+  if (activeCategory) {
+    filteredProducts = products.filter(
+      (item) => item.category == activeCategory.toLowerCase(),
+    );
+  }
+  if (activeBrand) {
+    filteredProducts = products.filter(
+      (item) => item.brand.toLowerCase() == activeBrand.toLowerCase(),
+    );
+  }
+
+
   return (
     <div className="min-h-screen bg-white p-6 px-[5vw] flex gap-6">
       {/* Sidebar Filters */}
@@ -11,30 +239,37 @@ export default function ShopPage() {
         <div className="mb-6">
           <h3 className="font-semibold mb-2">Category</h3>
           <div className="flex flex-col gap-2 text-sm">
-            <label><input type="checkbox" /> Clothing</label>
-            <label><input type="checkbox" /> Footwear</label>
-            <label><input type="checkbox" /> Bags</label>
-            <label><input type="checkbox" /> Accessories</label>
-            <label><input type="checkbox" /> Beauty & Personal Care</label>
-            <label><input type="checkbox" /> Home & Living</label>
-            <label><input type="checkbox" /> Reusable Products</label>
-            <label><input type="checkbox" /> Kitchen & Dining</label>
-            <label><input type="checkbox" /> Fitness & Outdoor</label>
+            {categories.map((item) => {
+              return (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={item == activeCategory || category.includes(item.toLowerCase()) ? true : false}
+                    onClick={() => handleClickedCategory(item)}
+                  />{" "}
+                  {item}
+                </label>
+              );
+            })}
           </div>
         </div>
 
         {/* Brands */}
         <div>
           <h3 className="font-semibold mb-2">Brand</h3>
-          <div className="flex flex-col gap-2 text-sm">
-            <label><input type="checkbox" /> Patagonia</label>
-            <label><input type="checkbox" /> Veja</label>
-            <label><input type="checkbox" /> Allbirds</label>
-            <label><input type="checkbox" /> Lush</label>
-            <label><input type="checkbox" /> Baggu</label>
-            <label><input type="checkbox" /> Tentree</label>
-            <label><input type="checkbox" /> Pangaia</label>
-            <label><input type="checkbox" /> Reformation</label>
+          <div className="flex flex-col gap-2 text-sm cursor-pointer">
+            {brands.map((item) => {
+              return (
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={activeBrand == item || brand.includes(item.toLowerCase()) ? true : false}
+                    onClick={() => handleClickedBrand(item)}
+                  />{" "}
+                  {item}
+                </label>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -45,67 +280,65 @@ export default function ShopPage() {
           <h1 className="text-3xl font-bold">Eco Shop</h1>
 
           {/* Sort Dropdown */}
-          <select className="border px-3 py-2 rounded-md text-sm">
+          <select
+            className="border px-3 py-2 rounded-md text-sm"
+            onChange={(event) => setSortBy(event.target.value)}
+          >
             <option>Sort By</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Title: A - Z</option>
-            <option>Title: Z - A</option>
+            <option value="Price: Low to High">Price: Low to High</option>
+            <option value="Price: High to Low">Price: High to Low</option>
+            <option value="Title: A - Z">Title: A - Z</option>
+            <option value="Title: Z - A">Title: Z - A</option>
           </select>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Product 1 */}
-          <div className="border rounded-xl overflow-hidden shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=400&q=80"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold">Organic Cotton T-Shirt</h3>
-              <p className="text-sm text-gray-500">Pangaia</p>
-              <p className="text-green-600 font-bold">₹1,499</p>
-            </div>
-          </div>
-
-          {/* Product 2 */}
-          <div className="border rounded-xl overflow-hidden shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold">Eco Sneakers</h3>
-              <p className="text-sm text-gray-500">Veja</p>
-              <p className="text-green-600 font-bold">₹6,999</p>
-            </div>
-          </div>
-
-          {/* Product 3 */}
-          <div className="border rounded-xl overflow-hidden shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=400&q=80"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold">Reusable Tote Bag</h3>
-              <p className="text-sm text-gray-500">Baggu</p>
-              <p className="text-green-600 font-bold">₹999</p>
-            </div>
-          </div>
-
-          {/* Product 4 */}
-          <div className="border rounded-xl overflow-hidden shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=400&q=80"
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold">Natural Face Wash</h3>
-              <p className="text-sm text-gray-500">Lush</p>
-              <p className="text-green-600 font-bold">₹799</p>
-            </div>
-          </div>
+          {
+            filteredProducts ?
+            filteredProducts.map((item) => {
+            const { _id, title, brand, price, image, status, stock } = item;
+            const wishlistProduct = wishlist.find(
+              (item) => item.productId == _id,
+            );
+            if (status == "Active") {
+              return (
+                <div
+                  className="border rounded-xl overflow-hidden shadow-sm relative "
+                 
+                >
+                  <img src={image} className="w-full h-48 object-cover" />
+                  <div className="p-4">
+                    <h3 className="font-semibold cursor-pointer"  onClick={() => openProductDetail(_id)}>{title}</h3>
+                    <p className="text-sm text-gray-500">{brand}</p>
+                    <p className="text-green-600 font-bold">
+                      ${price.toFixed(2)}
+                    </p>
+                  </div>
+                  <Button
+                    className="bg-[var(--main)] p-5 text-white flex  mx-auto mb-5 w-[90%]"
+                    onClick={() => handleAddToCart(_id)}
+                  >
+                    Add To Cart
+                  </Button>
+                  <Button
+                    className=" text-white flex rounded-[100%] absolute top-1 right-1 w-[35px] h-[35px]"
+                    onClick={() => handleAddToWishlist(_id)}
+                  >
+                    {" "}
+                    <Heart
+                      className={
+                        wishlistProduct
+                          ? "fill-red-600 stroke-transparent size-[25px] shadow-black"
+                          : "size-[25px] shadow-black stroke-[var(--main)]"
+                      }
+                    />
+                  </Button>
+                </div>
+              );
+            }
+          }) :
+          ''
+          }
         </div>
       </div>
     </div>

@@ -1,6 +1,18 @@
+import { addOrders } from "@/store/shop/CartSlice";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function CheckoutPage() {
+
+  const {user} = useSelector((state)=> state.auth);
+  const dispatch = useDispatch()
+
+  console.log("user in checkout page", user);
+
+  const handleAddOrders = ()=>{
+      dispatch(addOrders(user.userId))
+  }
+
   return (
     <div className="min-h-screen bg-white p-8">
       <h1 className="text-2xl font-semibold mb-6">Checkout</h1>
@@ -66,7 +78,7 @@ export default function CheckoutPage() {
             <span>₹8,598</span>
           </div>
 
-          <button className="w-full mt-6 bg-green-600 text-white py-3 rounded-md">
+          <button className="w-full mt-6 bg-green-600 text-white py-3 rounded-md" onClick={()=> handleAddOrders()}>
             Place Order
           </button>
         </div>

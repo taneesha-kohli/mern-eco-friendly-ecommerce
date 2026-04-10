@@ -1,36 +1,41 @@
+import { deleteProduct, fetchProducts, getProduct } from "@/store/shop/ProductSlice";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function AdminProductsPage() {
-  const products = [
-    {
-      id: "#P1001",
-      name: "Eco Cotton T-Shirt",
-      price: "₹799",
-      stock: 25,
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-    },
-    {
-      id: "#P1002",
-      name: "Reusable Water Bottle",
-      price: "₹499",
-      stock: 40,
-      image:
-        "https://images.unsplash.com/photo-1602143407151-7111542de6e8",
-    },
-    {
-      id: "#P1003",
-      name: "Bamboo Toothbrush",
-      price: "₹199",
-      stock: 100,
-      image:
-        "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5",
-    },
-  ];
+
+  const dispatch = useDispatch();
+  const {products} = useSelector((state)=> state.product);
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    dispatch(fetchProducts());
+  },[])
+
+
+  const handleDelete = (id)=>{
+    dispatch(deleteProduct(id)).then((res)=>{
+      if(res.payload.status)
+      {
+        toast.success("Product deleted successfully");
+        dispatch(fetchProducts());
+      }
+      else{
+        toast.error("Some error occurred while deleting the product");
+      }
+    })
+  }
+
+  const handleFetch = (id)=>{
+    dispatch(getProduct(id))
+   navigate("/admin/product-edit")
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-6 w-full">
       
       <div className="bg-white rounded-xl shadow p-6">
         
@@ -54,9 +59,9 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Table Header */}
-        <div className="grid grid-cols-6 bg-gray-100 p-3 rounded-lg text-sm font-medium text-gray-600">
+        <div className="grid grid-cols-5 bg-gray-100 p-3 rounded-lg text-sm font-medium text-gray-600">
           <div>Product</div>
-          <div>ID</div>
+          {/* <div>ID</div> */}
           <div>Price</div>
           <div>Stock</div>
           <div>Status</div>
@@ -68,23 +73,23 @@ export default function AdminProductsPage() {
           {products.map((product, index) => (
             <div
               key={index}
-              className="grid grid-cols-6 items-center p-3 border rounded-lg"
+              className="grid grid-cols-5 items-center p-3 border rounded-lg"
             >
               
               {/* Product Info */}
               <div className="flex items-center gap-3">
                 <img
                   src={product.image}
-                  alt={product.name}
+                  alt={product.title}
                   className="w-12 h-12 rounded-lg object-cover"
                 />
-                <p className="font-medium">{product.name}</p>
+                <p className="font-medium">{product.title}</p>
               </div>
 
-              <div>{product.id}</div>
+              {/* <div>{product._id}</div> */}
 
               <div className="font-medium text-[#00965f]">
-                {product.price}
+                ${(product.price).toFixed(2)}
               </div>
 
               <div>{product.stock}</div>
@@ -93,23 +98,23 @@ export default function AdminProductsPage() {
               <div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    product.stock > 0
+                    product.status == 'Active'
                       ? "bg-green-100 text-[#00965f]"
                       : "bg-red-100 text-red-500"
                   }`}
                 >
-                  {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                  {product.status}
                 </span>
               </div>
 
               {/* Actions */}
               <div className="flex justify-center gap-2">
                 <Link to="/admin/product-edit">
-                <button className="p-2 bg-blue-100 text-blue-600 rounded-full hover:scale-105">
+                <button className="p-2 bg-blue-100 text-blue-600 rounded-full hover:scale-105" onClick={()=> handleFetch(product._id)}>
                   <Pencil size={16} />
                 </button>
                 </Link>
-                <button className="p-2 bg-red-100 text-red-500 rounded-full hover:scale-105">
+                <button className="p-2 bg-red-100 text-red-500 rounded-full hover:scale-105" onClick={()=> handleDelete(product._id)}>
                   <Trash2 size={16} />
                 </button>
 

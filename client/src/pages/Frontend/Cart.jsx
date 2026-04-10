@@ -1,9 +1,72 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import products from "./products"
+import { useDispatch, useSelector } from "react-redux";
+import { deleteCart, fetchCart, getCartTotal, updateCart } from "@/store/shop/CartSlice";
+import { toast } from "react-toastify";
 
 export default function CartPage() {
+
+  const dispatch = useDispatch();
+
+  const {cartData} = useSelector((state)=> state.cart);
+  const { user } = useSelector((state)=> state.auth);
+
+  console.log("cart items", cartData, " products ", products, " user ", user);
+  let subtotal = 0
+
+  useEffect(()=>{
+    if(user)
+    {
+      console.log("fetch cart ran");
+      dispatch(fetchCart(user.userId))
+      dispatch(getCartTotal())
+    }
+  },[user])
+
+
+     const handleDeleteCart = (productId)=>{
+        const cartData = {
+          userId: user.userId,
+          productId: productId,
+        }
+  
+        dispatch(deleteCart(cartData)).then((res)=>{
+          if(res.payload.status)
+          {
+            toast.success("Product deleted to cart");
+            dispatch(fetchCart(user.userId));
+            dispatch(getCartTotal());
+          }
+         
+        })
+      }
+
+     const handleUpdateCart = (productId, action, quantity)=>{
+
+        if(action == 'inc' && quantity == 5)
+        {
+          toast.error("You can't add quantity more than 5")
+        }
+        const cartData = {
+          userId: user.userId,
+          productId: productId,
+          action: action
+        }
+  
+        dispatch(updateCart(cartData)).then((res)=>{
+          if(res.payload.status)
+          {
+            dispatch(fetchCart(user.userId))
+      
+              dispatch(getCartTotal());
+          }
+         
+        })
+      }
+
   return (
-    <div className="min-h-screen bg-white p-8">
+    <div className="min-h-screen bg-white p-8 px-20">
       <h1 className="text-2xl font-semibold mb-6">Shopping Cart</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -21,59 +84,52 @@ export default function CartPage() {
             </thead>
 
             <tbody>
-              {/* Item 1 */}
-              <tr className="border-b">
-                <td className="py-4 flex items-center gap-4">
-                  <img
-                    src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=200&q=80"
-                    className="w-20 h-20 object-cover"
-                  />
-                  <span>Black Hoodie</span>
-                </td>
-                <td>€70.00</td>
-                <td>
-                  <div className="flex items-center border w-fit">
-                    <button className="px-2 py-1 border-r">-</button>
-                    <input className="pl-4 w-[40px]"  type="number" value={1}/>
-                    <button className="px-2 py-1 border-l">+</button>
-                  </div>
-                </td>
-                <td>€70.00</td>
-                <td className="text-right text-gray-500 cursor-pointer text-[25px]">×</td>
-              </tr>
 
-              {/* Item 2 */}
-              <tr className="border-b">
+               {
+                cartData ?
+                cartData.map((item)=>{
+                  const {quantity} = item
+                  const {image, price, _id} = item.productId
+
+                    subtotal  = subtotal + (price * quantity)
+
+                    return(
+                                               <tr className="border-b">
                 <td className="py-4 flex items-center gap-4">
                   <img
-                    src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80"
+                    src={image}
                     className="w-20 h-20 object-cover"
                   />
-                  <span>Sleeveless Shirt</span>
+                  <span></span>
                 </td>
-                <td>€135.00</td>
+                <td>${price.toFixed(2)}</td>
                 <td>
                   <div className="flex items-center border w-fit">
-                    <button className="px-2 py-1 border-r">-</button>
-                     <input className="pl-4 w-[40px]"  type="number" value={1}/>
-                    <button className="px-2 py-1 border-l">+</button>
+                    <button className="px-2 py-1 border-r" onClick={()=> handleUpdateCart(_id, 'dec', quantity)}>-</button>
+                    <input className="pl-4 w-[40px]"  type="number" value={quantity}/>
+                    <button className="px-2 py-1 border-l" onClick={()=> handleUpdateCart(_id, 'inc', quantity)}>+</button>
                   </div>
                 </td>
-                <td>€135.00</td>
-                <td className="text-right text-gray-500 cursor-pointer text-[25px] ">×</td>
+                <td>${(price * quantity).toFixed(2)}</td>
+                <td className="text-right text-gray-500 cursor-pointer text-[25px]" onClick={()=> handleDeleteCart(_id)}>×</td>
               </tr>
+                    )
+                   })  :
+               
+                <h1 className="text-xl font-bold">No Product Found</h1>
+               }
+               
+                    
+        
+      
+
+          
+
+         
             </tbody>
           </table>
 
-          {/* Coupon */}
-          <div className="flex gap-3 mt-6">
-            <input
-              type="text"
-              placeholder="Coupon code"
-              className="border px-3 py-2 w-48"
-            />
-            <button className="border px-4 py-2">Apply coupon</button>
-          </div>
+
         </div>
 
         {/* Cart Totals */}
@@ -82,7 +138,7 @@ export default function CartPage() {
 
           <div className="flex justify-between mb-3">
             <span>Subtotal</span>
-            <span>€315.00</span>
+            <span>${subtotal.toFixed(2)}</span>
           </div>
 
           <div className="mb-4">
@@ -92,17 +148,17 @@ export default function CartPage() {
                 <input type="radio" name="shipping" /> Free shipping
               </label>
               <label>
-                <input type="radio" name="shipping" /> Flat rate: €10.00
+                <input type="radio" name="shipping" /> Flat rate: $10.00
               </label>
               <label>
-                <input type="radio" name="shipping" /> Pickup: €15.00
+                <input type="radio" name="shipping" /> Pickup: $15.00
               </label>
             </div>
           </div>
 
           <div className="flex justify-between font-semibold text-lg border-t pt-3">
             <span>Total</span>
-            <span>€315.00</span>
+            <span>${subtotal.toFixed(2)}</span>
           </div>
 
           <button className="w-full mt-6 bg-[var(--main)] text-white py-3">

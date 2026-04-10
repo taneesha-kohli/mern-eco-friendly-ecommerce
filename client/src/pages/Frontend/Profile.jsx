@@ -1,6 +1,10 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 
 const Profile = () => {
+
+  const {user} = useSelector((state)=> state.auth);
+
   return (
    <>
       {/* Main Content */}
@@ -29,7 +33,7 @@ const Profile = () => {
             </button>
           </div>
 
-          <h3 className="mt-3 font-semibold text-lg">Shivani K</h3>
+          <h3 className="mt-3 font-semibold text-lg">{user?.username}</h3>
         </div>
 
         {/* Form */}
@@ -39,7 +43,7 @@ const Profile = () => {
             <label className="text-sm font-medium">First Name</label>
             <input
               type="text"
-              defaultValue="Shivani"
+              defaultValue={user?.username.split(" ")[0]}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
@@ -48,7 +52,7 @@ const Profile = () => {
             <label className="text-sm font-medium">Last Name</label>
             <input
               type="text"
-              defaultValue="K"
+              defaultValue={user?.username.split(" ")[1]}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
@@ -66,7 +70,7 @@ const Profile = () => {
             <label className="text-sm font-medium">Email</label>
             <input
               type="email"
-              defaultValue="shivani.idigital22@gmail.com"
+              defaultValue={user?.email}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>

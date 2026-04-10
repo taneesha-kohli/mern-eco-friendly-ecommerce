@@ -1,5 +1,5 @@
 import { contactFormControls } from '@/FormControls'
-import FormLayout from '@/FormLayout'
+import FormLayout from '@/Layouts/FormLayout'
 import React from 'react'
 
 const Contact = () => {

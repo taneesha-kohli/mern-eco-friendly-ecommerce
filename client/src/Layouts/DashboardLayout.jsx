@@ -1,3 +1,4 @@
+import { isAction } from "@reduxjs/toolkit";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -5,9 +6,48 @@ import {
   Package,
   Settings,
 } from "lucide-react";
+import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 
+
 export default function DashboardLayout() {
+
+  const sideMenus = [
+   {
+    path: "/admin/dashboard",
+    icon: <LayoutDashboard size={18} />,
+    name: "Dashboard",
+   },
+   {
+    path: "/admin/banner",
+    icon: <LayoutDashboard size={18} />,
+    name: "Banner",
+   },
+   {
+    path: "/admin/orders",
+    icon: <ShoppingBag size={18} />,
+    name: "Orders",
+   },
+   {
+    path: "/admin/products",
+    icon: <Package size={18} />,
+    name: "Products",
+   },
+   {
+    path: "/admin/featured",
+    icon:<Package size={18} />,
+    name: "Featured Products",
+   },
+   {
+    path: "/admin/users",
+    icon:<Users size={18} />,
+    name: "Users",
+   },
+  ]
+
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <div className="min-h-screen flex bg-gray-100">
       
@@ -18,12 +58,22 @@ export default function DashboardLayout() {
         </h2>
 
         <ul className="space-y-3">
-        <Link to="/admin/dashboard">
-          <li className="flex items-center gap-3 p-3 bg-[#00965f]/10 text-[#00965f] rounded-lg">
-            <LayoutDashboard size={18} /> Dashboard
+        {sideMenus.map((item,index)=>{
+          return(
+          <Link to={item.path}>
+          <li className={`${index == activeIndex ? 'bg-[#00965f]/10 text-[#00965f] flex items-center gap-3 p-3 rounded-lg' : 'flex items-center gap-3 p-3 rounded-lg'}`} onClick={()=> setActiveIndex(index)}>
+            {/* <LayoutDashboard size={18} /> Dashboard */}
+            {item.icon} {item.name}
           </li>
         </Link>
-        <Link to="/admin/banner">
+          )
+        })}
+        {/* <Link to="/admin/dashboard">
+          <li className="flex items-center gap-3 p-3 bg-[#00965f]/10 text-[#00965f] rounded-lg" >
+            <LayoutDashboard size={18} /> Dashboard
+          </li>
+        </Link> */}
+        {/* <Link to="/admin/banner">
           <li className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer">
             <LayoutDashboard size={18} /> Banner
           </li>
@@ -50,7 +100,7 @@ export default function DashboardLayout() {
           </Link>
           <li className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer">
             <Settings size={18} /> Settings
-          </li>
+          </li> */}
         </ul>
       </div>
 

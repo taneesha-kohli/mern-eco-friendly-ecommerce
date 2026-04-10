@@ -1,17 +1,39 @@
+import { ProductFormControls } from "@/FormControls";
+import FormLayout from "@/Layouts/FormLayout";
+import { fetchProducts, getProduct, updateProduct } from "@/store/shop/ProductSlice";
 import { ArrowLeft, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function EditProductPage() {
-  const product = {
-    name: "Eco Cotton T-Shirt",
-    price: 799,
-    stock: 25,
-    category: "Clothing",
-    brand: "EcoWear",
-    description: "Comfortable eco-friendly cotton t-shirt.",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-    status: "Active",
-  };
+  
+  const {singleProduct} = useSelector((state)=> state.product);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  console.log("single product", singleProduct);
+
+    const [formData, setFormData] = useState({});
+
+  // console.log("form data in product edit", formData);
+  const handleOnSubmit = (event)=>{
+    console.log("form data", formData)
+    event.preventDefault();
+   dispatch(updateProduct(formData)).then((res)=>{
+    if(res.payload.status)
+    {
+      toast.success("Product updated successfully");
+      navigate("/admin/products");
+      dispatch(fetchProducts());
+    }
+   })
+  }
+
+  useEffect(()=>{
+    setFormData(singleProduct)
+  },[singleProduct])
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex justify-center w-full">
@@ -20,50 +42,48 @@ export default function EditProductPage() {
         
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
+        <Link to="/admin/products">
           <button className="p-2 border rounded-lg hover:bg-gray-100">
             <ArrowLeft size={18} />
           </button>
+          </Link>
           <h2 className="text-xl font-semibold">Edit Product</h2>
         </div>
 
         {/* Form */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* <form className="grid grid-cols-1 md:grid-cols-2 gap-5">
           
-          {/* Product Name */}
           <div className="md:col-span-2">
             <label className="text-sm font-medium">Product Name</label>
             <input
               type="text"
-              defaultValue={product.name}
+              defaultValue={singleProduct.title}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
 
-          {/* Price */}
           <div>
-            <label className="text-sm font-medium">Price (₹)</label>
+            <label className="text-sm font-medium">Price ($)</label>
             <input
               type="number"
-              defaultValue={product.price}
+              defaultValue={singleProduct.price}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
 
-          {/* Stock */}
           <div>
             <label className="text-sm font-medium">Stock Quantity</label>
             <input
               type="number"
-              defaultValue={product.stock}
+              defaultValue={singleProduct.quantity}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
 
-          {/* Category */}
           <div>
             <label className="text-sm font-medium">Category</label>
             <select
-              defaultValue={product.category}
+              value={singleProduct.category}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             >
               <option>Clothing</option>
@@ -74,34 +94,31 @@ export default function EditProductPage() {
             </select>
           </div>
 
-          {/* Brand */}
           <div>
             <label className="text-sm font-medium">Brand</label>
             <input
               type="text"
-              defaultValue={product.brand}
+              defaultValue={singleProduct.brand}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
 
-          {/* Description */}
           <div className="md:col-span-2">
             <label className="text-sm font-medium">Description</label>
             <textarea
               rows="4"
-              defaultValue={product.description}
+              defaultValue={singleProduct.description}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             />
           </div>
 
-          {/* Image Preview + Upload */}
           <div className="md:col-span-2">
-            <label className="text-sm font-medium">Product Image</label>
+            <label className="text-sm font-medium">singleProduct Image</label>
 
             <div className="mt-2 flex items-center gap-4">
               <img
-                src={product.image}
-                alt="product"
+                src={singleProduct.image}
+                alt="singleProduct"
                 className="w-20 h-20 rounded-lg object-cover border"
               />
 
@@ -113,11 +130,10 @@ export default function EditProductPage() {
             </div>
           </div>
 
-          {/* Status */}
           <div>
             <label className="text-sm font-medium">Status</label>
             <select
-              defaultValue={product.status}
+              defaultValue={singleProduct.status}
               className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00965f]"
             >
               <option>Active</option>
@@ -125,10 +141,18 @@ export default function EditProductPage() {
             </select>
           </div>
 
-        </form>
+        </form> */}
+
+        <FormLayout 
+        formControls={ProductFormControls}
+        buttonText={'Update Product'}
+        formData={formData}
+        setFormData={setFormData}
+        handleOnSubmit={handleOnSubmit}
+      />
 
         {/* Buttons */}
-        <div className="flex justify-end gap-3 mt-8">
+        {/* <div className="flex justify-end gap-3 mt-8">
           <button className="px-5 py-2 border rounded-lg hover:bg-gray-100">
             Cancel
           </button>
@@ -136,7 +160,7 @@ export default function EditProductPage() {
           <button className="px-5 py-2 bg-[#00965f] text-white rounded-lg hover:opacity-90">
             Update Product
           </button>
-        </div>
+        </div> */}
 
       </div>
     </div>
